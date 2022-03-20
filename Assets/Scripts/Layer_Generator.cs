@@ -22,6 +22,8 @@ public class Layer_Generator : MonoBehaviour
     [SerializeField]
     int layerThreeRarity;
 
+    [SerializeField]
+    Canvas canvas;
 
     // Start is called before the first frame update
     void Start()
@@ -35,27 +37,35 @@ public class Layer_Generator : MonoBehaviour
                 {
                     //Generate Layer One
                     GameObject layerOne = GameObject.Instantiate(rockLayer1);
-                    layerOne.transform.position += new Vector3(1.25F * i, 1.25F * -j, 0);
+                    layerOne.transform.position = new Vector3(1.25F * i, 1.25F * -j, 0);
+                    //Copy Canvas Offset fix
+                    layerOne.transform.position -= new Vector3(7.2498F, -7.962F, -0.12F);
+                    layerOne.transform.SetParent(canvas.transform);
+                    
                     //Generate a possible Layer Two on top of Layer One
                     if (Random.Range(0, 99) < layerTwoRarity)
                     {
                         GameObject layerTwo = GameObject.Instantiate(rockLayer2);
-                        layerTwo.transform.position += new Vector3(1.25F * i, 1.25F * -j, -0.2F);
+                        layerTwo.transform.position = new Vector3(1.25F * i, 1.25F * -j, 0);
+                        //Copy Canvas Offset fix
+                        layerTwo.transform.position -= new Vector3(7.2498F, -7.962F, -0.12F);
+                        layerTwo.transform.SetParent(canvas.transform);
 
                         if (Random.Range(0, 99) < layerThreeRarity)
                         {
                             GameObject layerThree = GameObject.Instantiate(rockLayer3);
-                            layerThree.transform.position += new Vector3(1.25F * i, 1.25F * -j, -0.4F);
+                            layerThree.transform.position = new Vector3(1.25F * i, 1.25F * -j, 0);
+                            //Copy Canvas Offset fix
+                            layerThree.transform.position -= new Vector3(7.2498F, -7.962F, -0.12F);
+                            layerThree.transform.SetParent(canvas.transform);
                         }
                     }
                 }
             }
         }
-        //Rarity or else it will be destroyed(not "Generated" but it is the origin point)
-        if (Random.Range(0, layerOneRarity) > 0)
-        {
-            Destroy(rockLayer1);
-        }
+        Destroy(rockLayer1);
+        Destroy(rockLayer2);
+        Destroy(rockLayer3);
     }
 
     // Update is called once per frame
