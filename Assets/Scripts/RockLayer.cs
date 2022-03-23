@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class RockLayer : MonoBehaviour
 {
+    [SerializeField]
+    WorldData worldDataHolder;
+
     public void onMineLayer()
     {
-        Debug.Log("seihfhudfuhgfhugfhuudfugfiudgfd");
+        worldDataHolder.addMined();
         Destroy(gameObject);
     }
 }

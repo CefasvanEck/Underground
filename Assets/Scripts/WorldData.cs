@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Layer_Generator : MonoBehaviour
+public class WorldData : MonoBehaviour
 {
     [SerializeField]
     GameObject rockLayer1;
@@ -25,9 +25,36 @@ public class Layer_Generator : MonoBehaviour
     [SerializeField]
     Canvas canvas;
 
+    [SerializeField]
+    GameObject crack;
+
+    //The position x of the crack and when reaching left, the game is over
+    private float crackLength = 9.14F;
+
+    public void addMined()
+    {
+        crackLength -= 0.25F;
+        if (crackLength < 0.29F)
+        {
+            crackLength = 0.29F;
+        }
+        Vector3 positionCrack = crack.transform.position;
+        crack.transform.position = new Vector3(crackLength, positionCrack.y, positionCrack.z);
+
+        //Crack "animation"
+        Vector3 scaleCrack = crack.transform.localScale;
+        crack.transform.localScale = new Vector3(scaleCrack.x, scaleCrack.y, -scaleCrack.z);
+
+
+        //Position x
+        //0.29 -> 9.14 = 8.85
+
+    }
+
     // Start is called before the first frame update
     void Start()
     {
+
         //Generate 11 by 7 grid of Rock Layers with a rarity set by the inspector
         for (int i = 0;i < 12;++i)
         {
