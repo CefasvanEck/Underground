@@ -7,9 +7,9 @@ public class WorldData : MonoBehaviour
     int[] hasItemInGrid = new int[96];
     int[] clearedLayerGrid = new int[96];
 
-    public int[] getClearedLayerGrid()
+    public void setClearedLayerGrid(int position, int data)
     {
-        return clearedLayerGrid;
+        clearedLayerGrid[position] = data;
     }
 
     //Layers 
@@ -152,10 +152,7 @@ public class WorldData : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    void Update(){}
 
     public void spawnItem(int itemType,int x,int y,int generatedLayer)
     {
