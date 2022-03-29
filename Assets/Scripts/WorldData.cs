@@ -7,11 +7,6 @@ public class WorldData : MonoBehaviour
     int[] hasItemInGrid = new int[96];
     int[] clearedLayerGrid = new int[96];
 
-    public void setClearedLayerGrid(int position, int data)
-    {
-        clearedLayerGrid[position] = data;
-    }
-
     //Layers 
     [SerializeField]
     GameObject rockLayer1;
@@ -81,7 +76,6 @@ public class WorldData : MonoBehaviour
         Vector3 scaleCrack = crack.transform.localScale;
         crack.transform.localScale = new Vector3(scaleCrack.x, scaleCrack.y, -scaleCrack.z);
 
-
         //Position x
         //0.29 -> 9.14 = 8.85s
     }
@@ -138,6 +132,7 @@ public class WorldData : MonoBehaviour
                 }
             }
         }
+//Clean up layers
         Destroy(rockLayer1);
         Destroy(rockLayer2);
         Destroy(rockLayer3);
@@ -172,11 +167,28 @@ public class WorldData : MonoBehaviour
                 hasItemInGrid[((x  + 1) * nextRow) + x + 1] = 1;
             }
             //Dont generate 1 spot outside so we do "x < 11"(0 - 11)s
-            else if (itemType == 1 && (generatedLayer == 2 ||  generatedLayer == 3) && Random.Range(0, 99) < 25 && x < 11 && hasItemInGrid[(x * y) + x + 1] == 0)
+            else if (itemType == 1 && (generatedLayer == 2 ||  generatedLayer == 3) && Random.Range(0, 99) < 25 && 
+            ((hasItemInGrid[(x * y) + x + 1]   == 0 && x < 11 ) ||
+            ( hasItemInGrid[(x * (y - 1)) + x] == 0 && y > 0)))
+            //Horizontal or vertical check
             {
                 item = GameObject.Instantiate(bone);
-                //Bone is 2 long
-                hasItemInGrid[((x + 1) * y) + x + 1] = 1;
+                if(((hasItemInGrid[(x * y) + x + 1] == 0 && x < 11) && Random.Range(0, 99) < 50))
+                {
+                    //Bone is 2 long
+                    hasItemInGrid[((x + 1) * y) + x + 1] = 1;
+                }
+                else if(y > 0 && hasItemInGrid[(x * (y - 1)) + x] == 0)
+                {
+                    //2 High
+                    hasItemInGrid[(x  * (y - 1)) + x] = 1;
+                    item.transform.rotation = Quaternion.Euler(0, 0, 90F);
+                }
+                else if (hasItemInGrid[(x * y) + x + 1] == 0 && x < 11)
+                {
+                    //Bone is 2 long
+                    hasItemInGrid[((x + 1) * y) + x + 1] = 1;
+                }
             }
             else if (itemType == 2 && Random.Range(0, 99) < 30)
             {
@@ -209,5 +221,10 @@ public class WorldData : MonoBehaviour
                 item.transform.SetParent(canvasItems.transform);
             }
         }
+    }
+
+    public void setClearedLayerGrid(int position, int data)
+    {
+        clearedLayerGrid[position] = data;
     }
 }
