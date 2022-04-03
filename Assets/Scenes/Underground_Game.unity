@@ -145,6 +145,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rocklayerType: -1
   worldDataHolder: {fileID: 208532174}
+  nextLayer: {fileID: 0}
 --- !u!114 &132114682
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -251,6 +252,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rocklayerType: -1
   worldDataHolder: {fileID: 208532174}
+  nextLayer: {fileID: 0}
 --- !u!114 &157553560
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -767,7 +769,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 563bb93b25d13ba4c96b1453827535ac, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0f1737855c9e0cf429e507c7375d7141, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -798,6 +800,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rocklayerType: 2
   worldDataHolder: {fileID: 208532174}
+  nextLayer: {fileID: 1991448190}
 --- !u!1 &459529605
 GameObject:
   m_ObjectHideFlags: 0
@@ -916,6 +919,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rocklayerType: -1
   worldDataHolder: {fileID: 208532174}
+  nextLayer: {fileID: 0}
 --- !u!114 &465323926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1254,6 +1258,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rocklayerType: -1
   worldDataHolder: {fileID: 208532174}
+  nextLayer: {fileID: 0}
 --- !u!114 &791050252
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1341,6 +1346,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rocklayerType: -1
   worldDataHolder: {fileID: 208532174}
+  nextLayer: {fileID: 0}
 --- !u!114 &810782556
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1597,7 +1603,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: a261311e08e482045a076975a1a16df1, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ad3613562357f7c418178f9a1e9dc1ee, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1628,6 +1634,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rocklayerType: 3
   worldDataHolder: {fileID: 208532174}
+  nextLayer: {fileID: 446116582}
 --- !u!1 &1750805827
 GameObject:
   m_ObjectHideFlags: 0
@@ -1757,6 +1764,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rocklayerType: -1
   worldDataHolder: {fileID: 208532174}
+  nextLayer: {fileID: 0}
 --- !u!114 &1845819584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1844,6 +1852,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rocklayerType: -1
   worldDataHolder: {fileID: 208532174}
+  nextLayer: {fileID: 0}
 --- !u!114 &1989707123
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1987,7 +1996,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: a0ef9155c4be6b34c970c462adedc4af, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5eb9795348fbe8b41b291a0138e3b536, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2018,3 +2027,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rocklayerType: 1
   worldDataHolder: {fileID: 208532174}
+  nextLayer: {fileID: 0}

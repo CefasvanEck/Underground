@@ -83,59 +83,53 @@ public class WorldData : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
         //Generate 11 by 7 grid of Rock Layers with a rarity set by the inspector
-        for (int i = 0;i < 12;++i)
+        for (int i = 11;i >= 0;--i)
         {
-            for (int j = 0; j < 8; ++j)
+            for (int j = 7; j >= 0; --j)
             {
                 int generatedLayer = 0;
                 if (Random.Range(0, 99) < layerOneRarity)
                 {
-                    //Generate Layer One
-                    GameObject layerOne = GameObject.Instantiate(rockLayer1);
-                    layerOne.transform.position = new Vector3(1.25F * i, 1.25F * -j, 0);
-                    //Copy Canvas Offset fix
-                    layerOne.transform.position -= new Vector3(7.2498F, -7.962F, -0.12F);
-                    layerOne.transform.SetParent(canvas.transform);
-                    ++generatedLayer;
-//Items
 
                     //Generate a possible Layer Two on top of Layer One
                     if (Random.Range(0, 99) < layerTwoRarity)
                     {
-                        GameObject layerTwo = GameObject.Instantiate(rockLayer2);
-                        layerTwo.transform.position = new Vector3(1.25F * i, 1.25F * -j, 0);
-                        //Copy Canvas Offset fix
-                        layerTwo.transform.position -= new Vector3(7.2498F, -7.962F, -0.12F);
-                        layerTwo.transform.SetParent(canvas.transform);
-                        ++generatedLayer;
- //Items
                         if (Random.Range(0, 99) < layerThreeRarity)
                         {
                             GameObject layerThree = GameObject.Instantiate(rockLayer3);
-                            layerThree.transform.position = new Vector3(1.25F * i, 1.25F * -j, 0);
-                            //Copy Canvas Offset fix
-                            layerThree.transform.position -= new Vector3(7.2498F, -7.962F, -0.12F);
-                            layerThree.transform.SetParent(canvas.transform);
-                            ++generatedLayer;
-//Items
-                            spawnItem(0, i, j, generatedLayer);
-                            spawnItem(1, i, j, generatedLayer);
-                            spawnItem(2, i, j, generatedLayer);
-                            spawnItem(3, i, j, generatedLayer);
-                            spawnItem(4, i, j, generatedLayer);
-                            spawnItem(5, i, j, generatedLayer);
-                            spawnItem(6, i, j, generatedLayer);
+                            setPosition(layerThree, i, j);
+                            generatedLayer = 3;
+                        }
+                        else
+                        {
+                            GameObject layerTwo = GameObject.Instantiate(rockLayer2);
+                            setPosition(layerTwo, i, j);
+                            generatedLayer = 2;
                         }
                     }
+                    else
+                    {
+                        //Generate Layer One
+                        GameObject layerOne = GameObject.Instantiate(rockLayer1);
+                        setPosition(layerOne, i, j);
+                        generatedLayer = 1;
+                    }
+
+                    spawnItem(0, i, j, generatedLayer);
+                    spawnItem(1, i, j, generatedLayer);
+                    spawnItem(2, i, j, generatedLayer);
+                    spawnItem(3, i, j, generatedLayer);
+                    spawnItem(4, i, j, generatedLayer);
+                    spawnItem(5, i, j, generatedLayer);
+                    spawnItem(6, i, j, generatedLayer);
                 }
             }
         }
-//Clean up layers
-        Destroy(rockLayer1);
-        Destroy(rockLayer2);
-        Destroy(rockLayer3);
+        //Move layers outside
+        rockLayer1.transform.position += new Vector3(50, 0, 0);
+        rockLayer2.transform.position += new Vector3(50, 0, 0);
+        rockLayer3.transform.position += new Vector3(50, 0, 0);
 //Clean up the progenitor items
         Destroy(diamond);
         Destroy(bone);
@@ -146,14 +140,25 @@ public class WorldData : MonoBehaviour
         Destroy(small_rock);
     }
 
+    //Set the right position in the grid by i and j gird array and set it to the right canvas
+    public void setPosition(GameObject newLayer,int x,int y)
+    {
+        newLayer.transform.position = new Vector3(1.25F * x, 1.25F * -y, 0);
+        //Copy Canvas Offset fix
+        newLayer.transform.position -= new Vector3(7.2498F, -7.962F, -0.12F);
+        newLayer.transform.SetParent(canvas.transform);
+    }
+
     // Update is called once per frame
     void Update(){}
 
     public void spawnItem(int itemType,int x,int y,int generatedLayer)
     {
         GameObject item = null;
-       
-        if (hasItemInGrid[(x * y) + x] == 0 && hasItemInGrid[(x * y) + x + 1] == 0)
+        //int[,]
+        //Enum for Items
+        //% items more clear
+        if (hasItemInGrid[(x * y) + x] == 0)
         {
             //Spawn Diamond
             //Check for 2 by 2
@@ -226,5 +231,11 @@ public class WorldData : MonoBehaviour
     public void setClearedLayerGrid(int position, int data)
     {
         clearedLayerGrid[position] = data;
+    }
+
+    //Get the canvas where the UI elements are so it will show up
+    public Canvas getCanvas()
+    {
+        return canvas;
     }
 }
