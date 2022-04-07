@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class WorldData : MonoBehaviour
 {
-    int[] hasItemInGrid = new int[96];
-    int[] clearedLayerGrid = new int[96];
+    int[,] hasItemInGrid = new int[12,8];
+    int[,] clearedLayerGrid = new int[12,8];
 
+    enum items { Diamond, Bone, Sulpher, Vanadanite, rock, roundRock, smallRock };
+    
     //Layers 
     [SerializeField]
     GameObject rockLayer1;
@@ -61,10 +63,27 @@ public class WorldData : MonoBehaviour
     //The position x of the crack and when reaching left, the game is over
     private float crackLength = 9.14F;
 
-    //Changes the crack at the top of the screen
-    public void addMined()
+    //Which tool is used(0 == pickaxe and 1 is Hammer)
+    int usingTools = 0;
+
+    public int getUsingTools()
     {
-        crackLength -= 0.25F;
+        return usingTools;
+    }
+
+    //For selecting Tools like Pickaxe(0) and Hammer(1)
+    public void setSelectedTool(int toolType)
+    {
+        if(toolType < 2 && toolType > -1)
+        {
+            usingTools = toolType;
+        }
+    }
+
+    //Changes the crack at the top of the screen
+    public void addMined(float addToCrack)
+    {
+        crackLength -= addToCrack;
         if (crackLength < 0.29F)
         {
             crackLength = 0.29F;
@@ -91,7 +110,6 @@ public class WorldData : MonoBehaviour
                 int generatedLayer = 0;
                 if (Random.Range(0, 99) < layerOneRarity)
                 {
-
                     //Generate a possible Layer Two on top of Layer One
                     if (Random.Range(0, 99) < layerTwoRarity)
                     {
@@ -116,16 +134,17 @@ public class WorldData : MonoBehaviour
                         generatedLayer = 1;
                     }
 
-                    spawnItem(0, i, j, generatedLayer);
-                    spawnItem(1, i, j, generatedLayer);
-                    spawnItem(2, i, j, generatedLayer);
-                    spawnItem(3, i, j, generatedLayer);
-                    spawnItem(4, i, j, generatedLayer);
-                    spawnItem(5, i, j, generatedLayer);
-                    spawnItem(6, i, j, generatedLayer);
+                    spawnItem(items.Diamond, i, j, generatedLayer);
+                    spawnItem(items.Bone, i, j, generatedLayer);
+                    spawnItem(items.Sulpher, i, j, generatedLayer);
+                    spawnItem(items.Vanadanite, i, j, generatedLayer);
+                    spawnItem(items.rock, i, j, generatedLayer);
+                    spawnItem(items.roundRock, i, j, generatedLayer);
+                    spawnItem(items.smallRock, i, j, generatedLayer);
                 }
             }
         }
+        
         //Move layers outside
         rockLayer1.transform.position += new Vector3(50, 0, 0);
         rockLayer2.transform.position += new Vector3(50, 0, 0);
@@ -151,74 +170,74 @@ public class WorldData : MonoBehaviour
 
     // Update is called once per frame
     void Update(){}
-
-    public void spawnItem(int itemType,int x,int y,int generatedLayer)
+    
+    void spawnItem(WorldData.items itemType,int x,int y,int generatedLayer)
     {
         GameObject item = null;
         //int[,]
         //Enum for Items
         //% items more clear
-        if (hasItemInGrid[(x * y) + x] == 0)
+        if (hasItemInGrid[x,y] == 0)
         {
             //Spawn Diamond
             //Check for 2 by 2
-            if (itemType == 0 && generatedLayer == 3 && Random.Range(0, 99) < 15 && x < 11 && y < 7 && hasItemInGrid[(x * y) + x + 1] == 0 && hasItemInGrid[((x + 1) * y) + x] == 0 && hasItemInGrid[(x * (y + 1)) + x + 1] == 0)
+            //8 * 2 by 2
+
+            //8 % and 2 by 2
+            if (itemType == items.Diamond && generatedLayer == 3 && Random.Range(0, 99) < 8 && x > 0 && y > 0 &&
+            hasItemInGrid[x - 1, y] == 0 &&
+            hasItemInGrid[x - 1, y - 1] == 0 &&
+            hasItemInGrid[x    , y - 1] == 0)
             {
                 item = GameObject.Instantiate(diamond);
-                //2 by 2 setting in Int Array
-                hasItemInGrid[((x + 1) * y) + x + 1] = 1;
-                int nextRow = y + 1;
-                hasItemInGrid[(x * nextRow) + x] = 1;
-                hasItemInGrid[((x  + 1) * nextRow) + x + 1] = 1;
+                hasItemInGrid[x - 1, y] = 1;
+                hasItemInGrid[x - 1, y - 1] = 1;
+                hasItemInGrid[x    , y - 1] = 1;
+
             }
-            //Dont generate 1 spot outside so we do "x < 11"(0 - 11)s
-            else if (itemType == 1 && (generatedLayer == 2 ||  generatedLayer == 3) && Random.Range(0, 99) < 25 && 
-            ((hasItemInGrid[(x * y) + x + 1]   == 0 && x < 11 ) ||
-            ( hasItemInGrid[(x * (y - 1)) + x] == 0 && y > 0)))
-            //Horizontal or vertical check
+            //11 % and 1 by 2
+            else if (itemType == items.Bone && generatedLayer == 3 && Random.Range(0, 99) < 11 && x > 1 && y > 1 && (hasItemInGrid[x, y - 1] == 0 || hasItemInGrid[x - 1, y] == 0))
             {
                 item = GameObject.Instantiate(bone);
-                if(((hasItemInGrid[(x * y) + x + 1] == 0 && x < 11) && Random.Range(0, 99) < 50))
+                if (hasItemInGrid[x, y - 1] == 0 && Random.Range(0, 99) < 50)
                 {
-                    //Bone is 2 long
-                    hasItemInGrid[((x + 1) * y) + x + 1] = 1;
+                    item.transform.rotation = Quaternion.Euler(0, 0, -90F);
+                    hasItemInGrid[x, y - 1] = 1;
                 }
-                else if(y > 0 && hasItemInGrid[(x * (y - 1)) + x] == 0)
+                else
                 {
-                    //2 High
-                    hasItemInGrid[(x  * (y - 1)) + x] = 1;
-                    item.transform.rotation = Quaternion.Euler(0, 0, 90F);
-                }
-                else if (hasItemInGrid[(x * y) + x + 1] == 0 && x < 11)
-                {
-                    //Bone is 2 long
-                    hasItemInGrid[((x + 1) * y) + x + 1] = 1;
+                    hasItemInGrid[x - 1, y] = 1;
                 }
             }
-            else if (itemType == 2 && Random.Range(0, 99) < 30)
+            //7 % and 1 by 1
+            else if (itemType == items.Sulpher && Random.Range(0, 99) < 7)
             {
                 item = GameObject.Instantiate(sulpher);
             }
-            else if (itemType == 3 && Random.Range(0, 99) < 35)
+            //6 % and 1 by 1
+            else if (itemType == items.Vanadanite && Random.Range(0, 99) < 6)
             {
                 item = GameObject.Instantiate(vanadanite);
             }
-            else if (itemType == 4 && Random.Range(0, 99) < 35)
+            //8 % and 1 by 1
+            else if (itemType == items.roundRock && Random.Range(0, 99) < 8)
             {
                 item = GameObject.Instantiate(round_rock);
             }
-            else if (itemType == 5 && Random.Range(0, 99) < 35)
+            //8 % and 1 by 1
+            else if (itemType == items.smallRock && Random.Range(0, 99) < 8)
             {
                 item = GameObject.Instantiate(small_rock);
             }
-            else if (itemType == 6 && Random.Range(0, 99) < 35)
+            //8 % and 1 by 1
+            else if (itemType == items.rock && Random.Range(0, 99) < 8)
             {
                 item = GameObject.Instantiate(rock);
             }
 
             if (item != null)
             {
-                hasItemInGrid[(x * y) + x] = 1;
+                hasItemInGrid[x,y] = 1;
                 item.transform.position = new Vector3(1.25F * x, 1.25F * -y, 0);
                 //Copy Canvas Offset fix
                 item.transform.position -= new Vector3(7.2498F, -7.962F, -0.12F);
@@ -228,9 +247,9 @@ public class WorldData : MonoBehaviour
         }
     }
 
-    public void setClearedLayerGrid(int position, int data)
+    public void setClearedLayerGrid(int positionX, int positionY, int data)
     {
-        clearedLayerGrid[position] = data;
+        clearedLayerGrid[positionX, positionY] = data;
     }
 
     //Get the canvas where the UI elements are so it will show up

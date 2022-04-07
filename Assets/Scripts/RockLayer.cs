@@ -13,6 +13,13 @@ public class RockLayer : MonoBehaviour
     [SerializeField]
     GameObject nextLayer;
 
+    int useHammer = 0;
+
+    public void setDestroyedByHammer()
+    {
+        useHammer = 1;
+    }
+
     public void onMineLayer()
     {
         //Enum for Rock Layer
@@ -24,7 +31,7 @@ public class RockLayer : MonoBehaviour
             int xPosition = (int)(position.x / 1.25F);
             int yPosition = (int)((-position.y + 0.1F) / 1.25F);
             //Debug.Log(xPosition + ":" + yPosition);
-            worldDataHolder.setClearedLayerGrid(xPosition + yPosition, 1);
+            worldDataHolder.setClearedLayerGrid(xPosition, yPosition, 1);
         }
         else if (rocklayerType == 2)
         {
@@ -38,12 +45,57 @@ public class RockLayer : MonoBehaviour
             next.transform.position = gameObject.transform.position;
             next.transform.SetParent(worldDataHolder.getCanvas().transform);
         }
-        worldDataHolder.addMined();
-        Destroy(gameObject);
-        
-    }
+        //For using the hammer to mine in a + and not a single rock layer
+        if (useHammer == 0 && worldDataHolder.getUsingTools() == 1)
+        {
+            //Origin position of this Rock Layer
+            Vector3 thisPosition = transform.position;
+            //List of all the Rock Layers in the Canvas
+            RockLayer[] layers = gameObject.transform.parent.GetComponentsInChildren<RockLayer>();
 
-    //GameObject gameobject gameObject.transform.parent.gameObject.GetComponent(typeof(HingeJoint));
+            foreach (RockLayer rockLayer in layers)
+            {
+                Vector3 layerPosition = rockLayer.gameObject.transform.position;
+                //Mine right side
+                if (layerPosition.x == thisPosition.x + 1.25 && layerPosition.y == thisPosition.y)
+                {
+                    rockLayer.setDestroyedByHammer();
+                    rockLayer.onMineLayer();
+                    worldDataHolder.addMined(0.25F / 4F);
+                }
+                //Mine left side
+                if (layerPosition.x == thisPosition.x - 1.25 && layerPosition.y == thisPosition.y)
+                {
+                    rockLayer.setDestroyedByHammer();
+                    rockLayer.onMineLayer();
+                    worldDataHolder.addMined(0.25F / 4F);
+                }
+
+                //Mine up
+                if (layerPosition.x == thisPosition.x && layerPosition.y == thisPosition.y + 1.25)
+                {
+                    rockLayer.setDestroyedByHammer();
+                    rockLayer.onMineLayer();
+                    worldDataHolder.addMined(0.25F / 4F);
+                }
+
+                //Mine Down
+                if (layerPosition.x == thisPosition.x && layerPosition.y == thisPosition.y - 1.25)
+                {
+                    rockLayer.setDestroyedByHammer();
+                    rockLayer.onMineLayer();
+                    worldDataHolder.addMined(0.25F / 4F);
+                }
+            }
+        }
+        else
+        {
+            //Add the crack
+            worldDataHolder.addMined(0.25F);
+        }
+       
+        Destroy(gameObject);
+    }
 }
 
 

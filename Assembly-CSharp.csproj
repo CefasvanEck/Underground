@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\RockLayer.cs" />
+     <Compile Include="Assets\Scripts\ToolSelecter.cs" />
      <Compile Include="Assets\Scripts\WorldData.cs" />
  <Reference Include="Unity.TextMeshPro.Editor">
  <HintPath>D:/Underground/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
