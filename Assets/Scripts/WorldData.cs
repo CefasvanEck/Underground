@@ -1,15 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class WorldData : MonoBehaviour
 {
     int[,] hasItemInGrid = new int[12,8];
     int[,] clearedLayerGrid = new int[12,8];
 
-    enum items { Diamond, Bone, Sulpher, Vanadanite, rock, roundRock, smallRock };
+    enum items { Diamond, Bone, Sulpher, Vanadanite, Calcite, rock, roundRock, smallRock };
     
-    //Layers 
+//Layers 
     [SerializeField]
     GameObject rockLayer1;
 
@@ -49,6 +50,9 @@ public class WorldData : MonoBehaviour
     GameObject vanadanite;
 
     [SerializeField]
+    GameObject calcite;
+
+    [SerializeField]
     GameObject bone;
 
     [SerializeField]
@@ -60,11 +64,19 @@ public class WorldData : MonoBehaviour
     [SerializeField]
     GameObject small_rock;
 
+    [SerializeField]
+    GameObject endOfRoundButton;
+
     //The position x of the crack and when reaching left, the game is over
     private float crackLength = 9.14F;
 
     //Which tool is used(0 == pickaxe and 1 is Hammer)
     int usingTools = 0;
+
+    //Score of the rounds
+    int roundOne = 0;
+    int roundTwo = 0;
+    int roundThree = 0;
 
     public int getUsingTools()
     {
@@ -87,6 +99,7 @@ public class WorldData : MonoBehaviour
         if (crackLength < 0.29F)
         {
             crackLength = 0.29F;
+            setEndMessage();
         }
         Vector3 positionCrack = crack.transform.position;
         crack.transform.position = new Vector3(crackLength, positionCrack.y, positionCrack.z);
@@ -94,16 +107,47 @@ public class WorldData : MonoBehaviour
         //Crack "animation"
         Vector3 scaleCrack = crack.transform.localScale;
         crack.transform.localScale = new Vector3(scaleCrack.x, scaleCrack.y, -scaleCrack.z);
-
         //Position x
         //0.29 -> 9.14 = 8.85s
+    }
+
+    //Writes new message for end of round and places it on the screen
+    public void setEndMessage()
+    {
+        endOfRoundButton.transform.position = new Vector3(0, 0, 0);
+        //Updating the text or setting the text of the end of rounds
+        if (roundOne == 0)
+        {
+            endOfRoundButton.GetComponentInChildren<Text>().text = "Round 1 score: " + roundOne;
+        }
+        else if (roundTwo == 0)
+        {
+            endOfRoundButton.GetComponentInChildren<Text>().text += ", Round 2 score: " + roundTwo;
+        }
+        else if (roundThree == 0)
+        {
+            endOfRoundButton.GetComponentInChildren<Text>().text += ", Round 3 score: " + roundThree;
+        }
+
+        endOfRoundButton.transform.SetParent(canvas.transform);
+    }
+
+    public void resetEndGameObjects()
+    {
+        crackLength = 9.14F;
+        endOfRoundButton.transform.position = new Vector3(50, 0, 0);
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        startRound();
+    }
+
+    public void startRound()
+    {
         //Generate 11 by 7 grid of Rock Layers with a rarity set by the inspector
-        for (int i = 11;i >= 0;--i)
+        for (int i = 11; i >= 0; --i)
         {
             for (int j = 7; j >= 0; --j)
             {
@@ -138,25 +182,48 @@ public class WorldData : MonoBehaviour
                     spawnItem(items.Bone, i, j, generatedLayer);
                     spawnItem(items.Sulpher, i, j, generatedLayer);
                     spawnItem(items.Vanadanite, i, j, generatedLayer);
+                    spawnItem(items.Calcite, i, j, generatedLayer);
                     spawnItem(items.rock, i, j, generatedLayer);
                     spawnItem(items.roundRock, i, j, generatedLayer);
                     spawnItem(items.smallRock, i, j, generatedLayer);
                 }
+                else
+                {
+                    setClearedLayerGrid(i, j, 1);
+                }
             }
         }
-        
+        //Move the progenitors outside vieuw field
         //Move layers outside
         rockLayer1.transform.position += new Vector3(50, 0, 0);
         rockLayer2.transform.position += new Vector3(50, 0, 0);
         rockLayer3.transform.position += new Vector3(50, 0, 0);
-//Clean up the progenitor items
-        Destroy(diamond);
-        Destroy(bone);
-        Destroy(sulpher);
-        Destroy(vanadanite);
-        Destroy(rock);
-        Destroy(round_rock);
-        Destroy(small_rock);
+        //Clean up the progenitor items
+        diamond.transform.position += new Vector3(50, 0, 0);
+        bone.transform.position += new Vector3(50, 0, 0);
+        sulpher.transform.position += new Vector3(50, 0, 0);
+        vanadanite.transform.position += new Vector3(50, 0, 0);
+        calcite.transform.position += new Vector3(50, 0, 0);
+        rock.transform.position += new Vector3(50, 0, 0);
+        round_rock.transform.position += new Vector3(50, 0, 0);
+        small_rock.transform.position += new Vector3(50, 0, 0);
+    }
+
+    //For end of the round, reset position progenitors
+    public void resetPositionProgenitors()
+    {
+        rockLayer1.transform.position -= new Vector3(50, 0, 0);
+        rockLayer2.transform.position -= new Vector3(50, 0, 0);
+        rockLayer3.transform.position -= new Vector3(50, 0, 0);
+        //Clean up the progenitor items
+        diamond.transform.position -= new Vector3(50, 0, 0);
+        bone.transform.position -= new Vector3(50, 0, 0);
+        sulpher.transform.position -= new Vector3(50, 0, 0);
+        vanadanite.transform.position -= new Vector3(50, 0, 0);
+        calcite.transform.position -= new Vector3(50, 0, 0);
+        rock.transform.position -= new Vector3(50, 0, 0);
+        round_rock.transform.position -= new Vector3(50, 0, 0);
+        small_rock.transform.position -= new Vector3(50, 0, 0);
     }
 
     //Set the right position in the grid by i and j gird array and set it to the right canvas
@@ -193,7 +260,6 @@ public class WorldData : MonoBehaviour
                 hasItemInGrid[x - 1, y] = 1;
                 hasItemInGrid[x - 1, y - 1] = 1;
                 hasItemInGrid[x    , y - 1] = 1;
-
             }
             //11 % and 1 by 2
             else if (itemType == items.Bone && generatedLayer == 3 && Random.Range(0, 99) < 11 && x > 1 && y > 1 && (hasItemInGrid[x, y - 1] == 0 || hasItemInGrid[x - 1, y] == 0))
@@ -218,6 +284,11 @@ public class WorldData : MonoBehaviour
             else if (itemType == items.Vanadanite && Random.Range(0, 99) < 6)
             {
                 item = GameObject.Instantiate(vanadanite);
+            }
+            //6 % and 1 by 1
+            else if (itemType == items.Calcite && Random.Range(0, 99) < 7)
+            {
+                item = GameObject.Instantiate(calcite);
             }
             //8 % and 1 by 1
             else if (itemType == items.roundRock && Random.Range(0, 99) < 8)

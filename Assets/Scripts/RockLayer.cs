@@ -97,6 +97,3 @@ public class RockLayer : MonoBehaviour
         Destroy(gameObject);
     }
 }
-
-
-//Unity gitignor 3de jaars
