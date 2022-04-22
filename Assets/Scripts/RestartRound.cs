@@ -5,14 +5,21 @@ using UnityEngine;
 public class RestartRound : MonoBehaviour
 {
     [SerializeField] WorldData worlddata;
+    [SerializeField] GameObject itemCanvas;
+    
+
+    void Start()
+    {
+  
+    }
 
     // Update is called once per frame
     public void onNextRoundClick()
     {
         //Looks for all the children GameObjects in the Canvas
-        for (int i = 0; i < worlddata.getCanvas().transform.GetChildCount(); i++)
+        for (int i = 0; i < itemCanvas.transform.GetChildCount(); i++)
         {
-            GameObject item = worlddata.getCanvas().transform.GetChild(i).gameObject;
+            GameObject item = itemCanvas.transform.GetChild(i).gameObject;
             string nameClone = item.name;
             //Looks for only (Cloned) Objects in the canvas and remove those, the progenitors are needed for next round
             if(nameClone.EndsWith(")"))
@@ -25,5 +32,14 @@ public class RestartRound : MonoBehaviour
         worlddata.resetPositionProgenitors();
         //Start next round
         worlddata.startRound();
+    }
+
+    public void revealAllItems()
+    {
+        for (int i = 0; i < worlddata.getRockLayers().Count; i++)
+        {
+            GameObject item = worlddata.getRockLayers()[i];
+            Destroy(item);
+        }
     }
 }

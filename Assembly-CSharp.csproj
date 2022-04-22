@@ -55,6 +55,7 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\RestartRound.cs" />
      <Compile Include="Assets\Scripts\RockLayer.cs" />
+     <Compile Include="Assets\Scripts\Score.cs" />
      <Compile Include="Assets\Scripts\ToolSelecter.cs" />
      <Compile Include="Assets\Scripts\WorldData.cs" />
  <Reference Include="Unity.TextMeshPro.Editor">
