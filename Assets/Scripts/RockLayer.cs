@@ -25,6 +25,13 @@ public class RockLayer : MonoBehaviour
 
     public void onMineLayer()
     {
+        //Hammer Function
+        areaDamage();
+        breakRockLayer();
+    }
+
+    public void breakRockLayer()
+    {
         //Lowest Layer when mined, should not spawn new rock layers and should add Points for revealing items
         if (rocklayerType == (int)rockLayers.layerLow)
         {
@@ -35,11 +42,7 @@ public class RockLayer : MonoBehaviour
             int yPosition = (int)((-position.y + 0.1F) / 1.25F);
             //Debug.Log(xPosition + ":" + yPosition);
             worldDataHolder.setClearedLayerGrid(xPosition, yPosition, 1);
-
-
-            worldDataHolder.itemScores.addRoundScore(xPosition, yPosition);
-
-
+            worldDataHolder.getScore().addRoundScore(xPosition, yPosition);
         }
         //Should jut spawn the next Rock Layer when mined
         else if (rocklayerType == (int)rockLayers.layerMid || rocklayerType == (int)rockLayers.layerTop)
@@ -49,8 +52,7 @@ public class RockLayer : MonoBehaviour
             next.transform.SetParent(worldDataHolder.getCanvas().transform);
             worldDataHolder.getRockLayers().Add(next);
         }
-        //Hammer Function
-        areaDamage();
+
         //Destroy this mined Rock Layer
         Destroy(gameObject);
     }
@@ -58,6 +60,7 @@ public class RockLayer : MonoBehaviour
     //The hammer does area damage in a + but will do less damage then what the pickaxe will do when mining all the + parts
     public void areaDamage()
     {
+        //Reset bool for checking if the crack has reached the left and so the round is over
         //For using the hammer to mine in a + and not a single rock layer
         if (useHammer == 0 && worldDataHolder.getUsingTools() == 1)
         {
@@ -73,38 +76,42 @@ public class RockLayer : MonoBehaviour
                 if (layerPosition.x == thisPosition.x + 1.25 && layerPosition.y == thisPosition.y)
                 {
                     rockLayer.setDestroyedByHammer();
-                    rockLayer.onMineLayer();
-                    worldDataHolder.addMined(0.25F / 4F);
+                    rockLayer.breakRockLayer();
+                    worldDataHolder.addMined(worldDataHolder.getCrackSpeed());
                 }
+
                 //Mine left side
                 if (layerPosition.x == thisPosition.x - 1.25 && layerPosition.y == thisPosition.y)
                 {
                     rockLayer.setDestroyedByHammer();
-                    rockLayer.onMineLayer();
-                    worldDataHolder.addMined(0.25F / 4F);
+                    rockLayer.breakRockLayer();
+                    worldDataHolder.addMined(worldDataHolder.getCrackSpeed());
                 }
 
                 //Mine up
                 if (layerPosition.x == thisPosition.x && layerPosition.y == thisPosition.y + 1.25)
                 {
                     rockLayer.setDestroyedByHammer();
-                    rockLayer.onMineLayer();
-                    worldDataHolder.addMined(0.25F / 4F);
+                    rockLayer.breakRockLayer();
+                    worldDataHolder.addMined(worldDataHolder.getCrackSpeed());
                 }
 
                 //Mine Down
                 if (layerPosition.x == thisPosition.x && layerPosition.y == thisPosition.y - 1.25)
                 {
                     rockLayer.setDestroyedByHammer();
-                    rockLayer.onMineLayer();
-                    worldDataHolder.addMined(0.25F / 4F);
+                    rockLayer.breakRockLayer();
                 }
             }
         }
         else
         {
             //Add the crack
-            worldDataHolder.addMined(0.25F);
+            worldDataHolder.addMined(worldDataHolder.getCrackSpeed());
         }
+
+        worldDataHolder.updateCrackLength();
+
+        worldDataHolder.reverseCrack();
     }
 }

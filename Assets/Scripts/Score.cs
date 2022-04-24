@@ -14,6 +14,13 @@ public class Score : MonoBehaviour
     int roundTwo = 0;
     int roundThree = 0;
 
+    public void clearScore()
+    {
+        roundOne = 0;
+        roundTwo = 0;
+        roundThree = 0;
+    }
+
     public int getRoundOneScore()
     {
         return roundOne;
@@ -55,32 +62,43 @@ public class Score : MonoBehaviour
     //Adds score for the revealed Item that was burried under the Rock Layer
     public void addRoundScore(int xPosition, int yPosition)
     {
-        int scoreToAdd;
-        if (worldDataHolder.getHasItemInGrid()[xPosition, yPosition] == (int)WorldData.items.Sulpher)
+        int scoreToAdd = 0;
+        if (worldDataHolder.getClearedLayerGrid()[xPosition, yPosition] == 1)
         {
-            scoreToAdd = (int)itemPoints.Sulpher;
-        }
-        else if (worldDataHolder.getHasItemInGrid()[xPosition, yPosition] == (int)WorldData.items.Vanadanite)
-        {
-            scoreToAdd = (int)itemPoints.Vanadanite;
-        }
-        else if (worldDataHolder.getHasItemInGrid()[xPosition, yPosition] == (int)WorldData.items.Calcite)
-        {
-            scoreToAdd = (int)itemPoints.Calcite;
-        }
-        else if (worldDataHolder.getHasItemInGrid()[xPosition, yPosition] == (int)WorldData.items.rock)
-        {
-            scoreToAdd = (int)itemPoints.rock;
-        }
-        else if (worldDataHolder.getHasItemInGrid()[xPosition, yPosition] == (int)WorldData.items.roundRock)
-        {
-            scoreToAdd = (int)itemPoints.roundRock;
-        }
-        else if (worldDataHolder.getHasItemInGrid()[xPosition, yPosition] == (int)WorldData.items.smallRock)
-        {
-            scoreToAdd = (int)itemPoints.smallRock;
-        }
+            if (worldDataHolder.getHasItemInGrid()[xPosition, yPosition] == (int)WorldData.items.Diamond)
+            {
+                scoreToAdd = (int)itemPoints.Diamond;
+            }
+            else if (worldDataHolder.getHasItemInGrid()[xPosition, yPosition] == (int)WorldData.items.Bone)
+            {
+                scoreToAdd = (int)itemPoints.Bone;
+            }
+            else if (worldDataHolder.getHasItemInGrid()[xPosition, yPosition] == (int)WorldData.items.Sulpher)
+            {
+                scoreToAdd = (int)itemPoints.Sulpher;
+            }
+            else if (worldDataHolder.getHasItemInGrid()[xPosition, yPosition] == (int)WorldData.items.Vanadanite)
+            {
+                scoreToAdd = (int)itemPoints.Vanadanite;
+            }
+            else if (worldDataHolder.getHasItemInGrid()[xPosition, yPosition] == (int)WorldData.items.Calcite)
+            {
+                scoreToAdd = (int)itemPoints.Calcite;
+            }
+            else if (worldDataHolder.getHasItemInGrid()[xPosition, yPosition] == (int)WorldData.items.rock)
+            {
+                scoreToAdd = (int)itemPoints.rock;
+            }
+            else if (worldDataHolder.getHasItemInGrid()[xPosition, yPosition] == (int)WorldData.items.roundRock)
+            {
+                scoreToAdd = (int)itemPoints.roundRock;
+            }
+            else if (worldDataHolder.getHasItemInGrid()[xPosition, yPosition] == (int)WorldData.items.smallRock)
+            {
+                scoreToAdd = (int)itemPoints.smallRock;
+            }
 
-        addCurrentRoundScore((int)itemPoints.smallRock, worldDataHolder.getCurrentRound());
+            addCurrentRoundScore(scoreToAdd, worldDataHolder.getCurrentRound());
+        }
     }
 }

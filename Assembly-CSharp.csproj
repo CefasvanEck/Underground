@@ -53,6 +53,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Difficulty.cs" />
      <Compile Include="Assets\Scripts\RestartRound.cs" />
      <Compile Include="Assets\Scripts\RockLayer.cs" />
      <Compile Include="Assets\Scripts\Score.cs" />

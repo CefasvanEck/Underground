@@ -8,17 +8,15 @@ public class WorldData : MonoBehaviour
     int[,] hasItemInGrid = new int[12, 8];
     int[,] clearedLayerGrid = new int[12, 8];
 
-    public int[,] getHasItemInGrid()
-    {
-        return hasItemInGrid;
-    }
-
-    public Score itemScores;
-
     //Which round the player is in
     int currentRound;
 
+    //Has all the round score
+    Score itemScores;
+
     public enum items { empty, Diamond, Bone, Sulpher, Vanadanite, Calcite, rock, roundRock, smallRock };
+
+    enum itemsRare { Diamond = 8, Bone = 11, Sulpher = 7, Vanadanite = 6, Calcite = 7, rock = 8, roundRock = 8, smallRock = 8 };
 
     //Layers 
     [SerializeField]
@@ -78,13 +76,30 @@ public class WorldData : MonoBehaviour
     GameObject endOfRoundButton;
 
     [SerializeField]
+    Text roundText;
+
+    [SerializeField]
+    Text finalScoreText;
+
+    [SerializeField]
+    Text buttonClickMessage;
+
+    [SerializeField]
     RestartRound restartRound;
-    
+
+    private float difficultyCrackSpeed;
+
+    //Get the Float of how fast the crack will travel after one click
+    public float getCrackSpeed()
+    {
+        return difficultyCrackSpeed;
+    }
+
     //The position x of the crack and when reaching left, the game is over
-    private float crackLength = 9.14F;
+    private float crackLength;
 
     //Which tool is used(0 == pickaxe and 1 is Hammer)
-    int usingTools = 0;
+    int usingTools;
 
     //List with cloned Rock layers
     //(Used for when the round is over, all Rock Layers will be deleted and show where all the items were hidden)
@@ -112,57 +127,33 @@ public class WorldData : MonoBehaviour
     }
 
     //Changes the crack at the top of the screen
-    public void addMined(float addToCrack)
+    public bool addMined(float addToCrack)
     {
-        if (crackLength < 0.29F && crackLength != 0.3)
+        if (crackLength < 0.29F)
         {
-            crackLength = 0.3F;
-            setEndMessage();
+            crackLength = 0.29F;
+            return true;
         }
-        else if(crackLength != 0.3)
+        else
         {
             crackLength -= addToCrack;
+            return false;
         }
-
-        updateCrackLength();
-
-        //Crack "animation"
-        Vector3 scaleCrack = crack.transform.localScale;
-        crack.transform.localScale = new Vector3(scaleCrack.x, scaleCrack.y, -scaleCrack.z);
-        //Position x
-        //0.29 -> 9.14 = 8.85s
     }
 
     //Updates the position of the crack on the screen
-    void updateCrackLength()
+    public void updateCrackLength()
     {
+        //Update position of crack
         Vector3 positionCrack = crack.transform.position;
         crack.transform.position = new Vector3(crackLength, positionCrack.y, positionCrack.z);
     }
 
-    //Writes new message for end of round and places it on the screen
-    public void setEndMessage()
+    public void reverseCrack()
     {
-        endOfRoundButton.transform.position = new Vector3(0, 0, 0);
-       
-        //Updating the text or setting the text of the end of rounds
-        if (currentRound == 1)
-        {
-            endOfRoundButton.GetComponentInChildren<Text>().text = "Round 1 score: " + itemScores.getRoundOneScore();
-        }
-        else if (currentRound == 2)
-        {
-            endOfRoundButton.GetComponentInChildren<Text>().text += ", Round 2 score: " + itemScores.getRoundTwoScore();
-        }
-        else if(currentRound == 3)
-        {
-            endOfRoundButton.GetComponentInChildren<Text>().text += ", Round 3 score: " + itemScores.getRoundThreeScore();
-        }
-
-        ++currentRound;
-
-        endOfRoundButton.transform.SetParent(canvas.transform);
-        restartRound.revealAllItems();
+        //Crack "animation"(Reverse crack image)
+        Vector3 scaleCrack = crack.transform.localScale;
+        crack.transform.localScale = new Vector3(scaleCrack.x, scaleCrack.y, -scaleCrack.z);
     }
 
     //The list of Cloned Rock Layers(Clone)
@@ -184,10 +175,75 @@ public class WorldData : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        difficultyCrackSpeed = 0.25F;
+        crackLength = 9.14F;
+        usingTools = 0;
         itemScores = new Score(this);
         currentRound = 0;
         rockLayers = new List<GameObject>();
+    }
+
+    //Changes the crack peed when mining so you have less clicks when the number is high
+    public void changesDifficulty(float speed)
+    {
+        difficultyCrackSpeed = speed;
+    }
+
+    //Starts the first round and hides menu buttons
+    public void startGame()
+    {
         startRound();
+        //Hide the buttons
+        this.restartRound.showMenuButtons(false);
+    }
+
+    void Update()
+    {
+        //Make sure that all the layers have been mined and that when
+        //crackLength == 0.29F, round is over and should reveal all exsisting Items
+        //We do this in the Update() because if we do it after the last Mined Layer, the GameObject.Instantiate does not
+        //fire directly(?) and this will cause Rock Layers to appear on the screen after everything should be gone
+        if (crackLength == 0.29F)
+        {
+            setEndMessage();
+            crackLength = 0.3F;
+        }
+    }
+
+    //Writes new message for end of round and places it on the screen
+    void setEndMessage()
+    {
+        ++currentRound;
+        endOfRoundButton.transform.position = new Vector3(0, 0, 0);
+
+        //Updating the text or setting the text of the end of rounds
+        if (currentRound == 1)
+        {
+            roundText.text = "Round 1 score: " + itemScores.getRoundOneScore();
+            finalScoreText.text = "";
+        }
+        else if (currentRound == 2)
+        {
+            roundText.text += ", Round 2 score: " + itemScores.getRoundTwoScore();
+        }
+        else if (currentRound == 3)
+        {
+            roundText.text += ", Round 3 score: " + itemScores.getRoundThreeScore();
+            //All score from the 3 rounds
+            finalScoreText.text = "Final Score: " + (itemScores.getRoundOneScore() + itemScores.getRoundTwoScore() + itemScores.getRoundThreeScore());
+            //New message
+            buttonClickMessage.text = "Click to return to the Main Menu";
+        }
+
+        endOfRoundButton.transform.SetParent(canvas.transform);
+        restartRound.revealAllItems();
+    }
+
+    //When last round, clear all score because you will be send back to the main menu
+    public void resetScore()
+    {
+        currentRound = 0;
+        itemScores.clearScore();
     }
 
     //Generates all items and layers and moves the progenitors out of vieuw
@@ -243,12 +299,11 @@ public class WorldData : MonoBehaviour
                 }
             }
         }
-        //Move the progenitors outside vieuw field
         //Move layers outside
         rockLayer1.transform.position += new Vector3(50, 0, 0);
         rockLayer2.transform.position += new Vector3(50, 0, 0);
         rockLayer3.transform.position += new Vector3(50, 0, 0);
-        //Clean up the progenitor items
+        //Move the progenitors outside vieuw field
         diamond.transform.position += new Vector3(50, 0, 0);
         bone.transform.position += new Vector3(50, 0, 0);
         sulpher.transform.position += new Vector3(50, 0, 0);
@@ -259,7 +314,7 @@ public class WorldData : MonoBehaviour
         small_rock.transform.position += new Vector3(50, 0, 0);
     }
 
-    //For end of the round, reset position progenitors
+    //For end of the round, reset position progenitors(Which where the clones come from)
     public void resetPositionProgenitors()
     {
         rockLayer1.transform.position -= new Vector3(50, 0, 0);
@@ -276,29 +331,15 @@ public class WorldData : MonoBehaviour
         small_rock.transform.position -= new Vector3(50, 0, 0);
     }
 
-    //Set the right position in the grid by i and j gird array and set it to the right canvas
-    public void setPosition(GameObject newLayer,int x,int y)
-    {
-        newLayer.transform.position = new Vector3(1.25F * x, 1.25F * -y, 0);
-        //Copy Canvas Offset fix
-        newLayer.transform.position -= new Vector3(7.2498F, -7.962F, -0.12F);
-        newLayer.transform.SetParent(canvas.transform);
-    }
-    
+    //Spawn the item under the rocklayer
     void spawnItem(WorldData.items itemType,int x,int y,int generatedLayer)
     {
         GameObject item = null;
-        //int[,]
-        //Enum for Items
-        //% items more clear
         if (hasItemInGrid[x,y] == 0)
         {
             //Spawn Diamond
             //Check for 2 by 2
-            //8 * 2 by 2
-
-            //8 % and 2 by 2
-            if (itemType == items.Diamond && generatedLayer == 3 && Random.Range(0, 99) < 8 && x > 0 && y > 0 &&
+            if (itemType == items.Diamond && generatedLayer == 3 && Random.Range(0, 99) < (int)itemsRare.Diamond && x > 0 && y > 0 &&
             hasItemInGrid[x - 1, y] == 0 &&
             hasItemInGrid[x - 1, y - 1] == 0 &&
             hasItemInGrid[x    , y - 1] == 0)
@@ -309,8 +350,9 @@ public class WorldData : MonoBehaviour
                 hasItemInGrid[x - 1, y - 1] = (int)items.Diamond;
                 hasItemInGrid[x    , y - 1] = (int)items.Diamond;
             }
+            //Bone
             //11 % and 1 by 2
-            else if (itemType == items.Bone && generatedLayer == 3 && Random.Range(0, 99) < 11 && x > 1 && y > 1 && (hasItemInGrid[x, y - 1] == 0 || hasItemInGrid[x - 1, y] == 0))
+            else if (itemType == items.Bone && generatedLayer == 3 && Random.Range(0, 99) < (int)itemsRare.Bone && x > 1 && y > 1 && (hasItemInGrid[x, y - 1] == 0 || hasItemInGrid[x - 1, y] == 0))
             {
                 item = GameObject.Instantiate(bone);
                 hasItemInGrid[x, y] = (int)items.Bone;
@@ -324,38 +366,42 @@ public class WorldData : MonoBehaviour
                     hasItemInGrid[x - 1, y] = (int)items.Bone;
                 }
             }
+            //Sulpher
             //7 % and 1 by 1
-            else if (itemType == items.Sulpher && Random.Range(0, 99) < 7)
+            else if (itemType == items.Sulpher && Random.Range(0, 99) < (int)itemsRare.Sulpher)
             {
                 item = GameObject.Instantiate(sulpher);
                 hasItemInGrid[x, y] = (int)items.Sulpher;
             }
+            //Vanadanite
             //6 % and 1 by 1
-            else if (itemType == items.Vanadanite && Random.Range(0, 99) < 6)
+            else if (itemType == items.Vanadanite && Random.Range(0, 99) < (int)itemsRare.Vanadanite)
             {
                 item = GameObject.Instantiate(vanadanite);
                 hasItemInGrid[x, y] = (int)items.Vanadanite;
             }
+            //Calcite
             //6 % and 1 by 1
-            else if (itemType == items.Calcite && Random.Range(0, 99) < 7)
+            else if (itemType == items.Calcite && Random.Range(0, 99) < (int)itemsRare.Calcite)
             {
                 item = GameObject.Instantiate(calcite);
                 hasItemInGrid[x, y] = (int)items.Calcite;
             }
+            //Rock
             //8 % and 1 by 1
-            else if (itemType == items.roundRock && Random.Range(0, 99) < 8)
+            else if (itemType == items.roundRock && Random.Range(0, 99) < (int)itemsRare.roundRock)
             {
                 item = GameObject.Instantiate(round_rock);
                 hasItemInGrid[x, y] = (int)items.roundRock;
             }
             //8 % and 1 by 1
-            else if (itemType == items.smallRock && Random.Range(0, 99) < 8)
+            else if (itemType == items.smallRock && Random.Range(0, 99) < (int)itemsRare.smallRock)
             {
                 item = GameObject.Instantiate(small_rock);
                 hasItemInGrid[x, y] = (int)items.smallRock;
             }
             //8 % and 1 by 1
-            else if (itemType == items.rock && Random.Range(0, 99) < 8)
+            else if (itemType == items.rock && Random.Range(0, 99) < (int)itemsRare.rock)
             {
                 item = GameObject.Instantiate(rock);
                 hasItemInGrid[x, y] = (int)items.rock;
@@ -371,6 +417,16 @@ public class WorldData : MonoBehaviour
         }
     }
 
+    //Set the right position in the grid by i and j gird array and set it to the right canvas
+    public void setPosition(GameObject newLayer, int x, int y)
+    {
+        newLayer.transform.position = new Vector3(1.25F * x, 1.25F * -y, 0);
+        //Copy Canvas Offset fix
+        newLayer.transform.position -= new Vector3(7.2498F, -7.962F, -0.12F);
+        newLayer.transform.SetParent(canvas.transform);
+    }
+
+    //Set the data in the grid of layers
     public void setClearedLayerGrid(int positionX, int positionY, int data)
     {
         clearedLayerGrid[positionX, positionY] = data;
@@ -380,5 +436,20 @@ public class WorldData : MonoBehaviour
     public Canvas getCanvas()
     {
         return canvas;
+    }
+
+    public int[,] getHasItemInGrid()
+    {
+        return hasItemInGrid;
+    }
+
+    public int[,] getClearedLayerGrid()
+    {
+        return clearedLayerGrid;
+    }
+
+    public Score getScore()
+    {
+        return itemScores;
     }
 }

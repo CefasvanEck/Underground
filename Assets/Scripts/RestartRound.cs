@@ -1,19 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class RestartRound : MonoBehaviour
 {
-    [SerializeField] WorldData worlddata;
-    [SerializeField] GameObject itemCanvas;
-    
+    [SerializeField] 
+    WorldData worlddata;
 
-    void Start()
-    {
-  
-    }
+    [SerializeField] 
+    GameObject itemCanvas;
 
-    // Update is called once per frame
+    [SerializeField]
+    Button startGameButton;
+
+    [SerializeField]
+    Button difficultyButton;
+
+    // Removes all the (Clone) Objects from the canvas
     public void onNextRoundClick()
     {
         //Looks for all the children GameObjects in the Canvas
@@ -31,7 +35,26 @@ public class RestartRound : MonoBehaviour
         //Sets the progenitors(Not clones) back at there original positions
         worlddata.resetPositionProgenitors();
         //Start next round
-        worlddata.startRound();
+
+        if(worlddata.getCurrentRound() < 3)
+        {
+            worlddata.startRound();
+        }
+        else
+        {
+            if (worlddata.getCurrentRound() == 3)
+            {
+                //Show the buttons because you are now in the main menu
+                showMenuButtons(true);
+                worlddata.resetScore();
+            }
+        }
+    }
+
+    public void showMenuButtons(bool active)
+    {
+        startGameButton.gameObject.SetActive(active);
+        difficultyButton.gameObject.SetActive(active);
     }
 
     public void revealAllItems()
